@@ -1,0 +1,38 @@
+specVersion: 0.0.1
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: Factory
+    network: ropsten
+    source:
+      address: "0x3fdB4b27e1b4be9b27514C643a8Baef95Cf9b549"
+      abi: Factory
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.2
+      language: wasm/assemblyscript
+      entities:
+        - LendingPoolInitialized
+        - NewAdmin
+        - NewPendingAdmin
+        - NewReservesAdmin
+        - NewReservesManager
+        - NewReservesPendingAdmin
+      abis:
+        - name: Factory
+          file: ./abis/Factory.json
+      eventHandlers:
+        - event: LendingPoolInitialized(indexed address,indexed address,indexed address,address,address,address,uint256)
+          handler: handleLendingPoolInitialized
+        - event: NewAdmin(address,address)
+          handler: handleNewAdmin
+        - event: NewPendingAdmin(address,address)
+          handler: handleNewPendingAdmin
+        - event: NewReservesAdmin(address,address)
+          handler: handleNewReservesAdmin
+        - event: NewReservesManager(address,address)
+          handler: handleNewReservesManager
+        - event: NewReservesPendingAdmin(address,address)
+          handler: handleNewReservesPendingAdmin
+      file: ./src/mapping.ts

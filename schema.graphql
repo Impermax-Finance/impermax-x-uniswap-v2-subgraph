@@ -1,0 +1,6 @@
+type ExampleEntity @entity {
+  id: ID!
+  count: BigInt!
+  uniswapV2Pair: Bytes! # address
+  token0: Bytes! # address
+}
