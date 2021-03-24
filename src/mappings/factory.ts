@@ -1,26 +1,26 @@
-import { BigInt, BigDecimal } from "@graphprotocol/graph-ts"
+import { BigInt, BigDecimal, log } from "@graphprotocol/graph-ts"
 import {
   LendingPoolInitialized
 } from "../types/Factory/Factory"
-import { Factory, Token, LendingPool, Collateral, Borrowable } from "../types/schema"
-import {
-  FACTORY_ADDRESS,
+import { Factory/*, Token, LendingPool, Collateral, Borrowable*/ } from "../types/schema"
+/*import {
   ZERO_BD,
   ZERO_BI,
   fetchTokenSymbol,
   fetchTokenName,
   fetchTokenDecimals,
   fetchTokenTotalSupply
-} from './helpers'
+} from './helpers'*/
 
 
 export function handleLendingPoolInitialized(event: LendingPoolInitialized): void {
-  let factory = Factory.load(FACTORY_ADDRESS)
+  log.debug("Entered", [])
+  let factory = Factory.load(event.address.toHexString())
   if (factory === null) {
-	factory = new Factory(FACTORY_ADDRESS)
+	factory = new Factory(event.address.toHexString())
   }
   factory.save()
-  
+  /*
   let token0 = Token.load(event.params.token0.toHexString())
   let token1 = Token.load(event.params.token1.toHexString())
 
@@ -74,6 +74,6 @@ export function handleLendingPoolInitialized(event: LendingPoolInitialized): voi
   lendingPool.collateral = collateral.id
   lendingPool.borrowable0 = borrowable0.id
   lendingPool.borrowable1 = borrowable1.id
-  lendingPool.save()
+  lendingPool.save()*/
 }
 

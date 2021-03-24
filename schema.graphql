@@ -3,46 +3,46 @@ type Factory @entity {
   id: ID!
 }
 
-type Token @entity {
-  # token address
-  id: ID!
-
-  # mirrored from the smart contract
-  symbol: String!
-  name: String!
-  decimals: BigInt!
-}
-
-type LendingPool @entity {
-  # uniswap pair address
-  id: ID!
-  
-  collateral: Collateral!
-  borrowable0: Borrowable!
-  borrowable1: Borrowable!
-}
-
-type Collateral @entity {
-  # address
-  id: ID!
-  
-  # mirrored from the smart contract
-  totalBalance: BigDecimal!
-  safetyMargin: BigDecimal!
-  liquidationIncentive: BigDecimal!
-}
-
-type Borrowable @entity {
-  # address
-  id: ID!
-  
-  # mirrored from the smart contract
-  underlying: Token!
-  totalBalance: BigDecimal!
-  totalBorrows: BigDecimal!
-  borrowRate: BigDecimal!
-  reserveFactor: BigDecimal!
-  kinkBorrowRate: BigDecimal!
-  kinkUtilizationRate: BigDecimal!
-  accrualTimestamp: BigInt!
-}
+#type Token @entity {
+#  # token address
+#  id: ID!
+#
+#  # mirrored from the smart contract
+#  symbol: String!
+#  name: String!
+#  decimals: BigInt!
+#}
+#
+#type LendingPool @entity {
+#  # uniswap pair address
+#  id: ID!
+#  
+#  collateral: Collateral!
+#  borrowable0: Borrowable!
+#  borrowable1: Borrowable!
+#}
+#
+#type Collateral @entity {
+#  # address
+#  id: ID!
+#  
+#  # mirrored from the smart contract
+#  totalBalance: BigDecimal!
+#  safetyMargin: BigDecimal!
+#  liquidationIncentive: BigDecimal!
+#}
+#
+#type Borrowable @entity {
+#  # address
+#  id: ID!
+#  
+#  # mirrored from the smart contract
+#  underlying: Token!
+#  totalBalance: BigDecimal!
+#  totalBorrows: BigDecimal!
+#  borrowRate: BigDecimal!
+#  reserveFactor: BigDecimal!
+#  kinkBorrowRate: BigDecimal!
+#  kinkUtilizationRate: BigDecimal!
+#  accrualTimestamp: BigInt!
+#}
