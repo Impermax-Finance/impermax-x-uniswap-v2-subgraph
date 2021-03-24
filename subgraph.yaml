@@ -1,4 +1,5 @@
-specVersion: 0.0.1
+specVersion: 0.0.2
+repository: https://github.com/Impermax-Finance/impermax-x-uniswapv2-subgraph
 schema:
   file: ./schema.graphql
 dataSources:
@@ -8,31 +9,78 @@ dataSources:
     source:
       address: "0x3fdB4b27e1b4be9b27514C643a8Baef95Cf9b549"
       abi: Factory
+      startBlock: 11800000
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.2
+      apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - LendingPoolInitialized
-        - NewAdmin
-        - NewPendingAdmin
-        - NewReservesAdmin
-        - NewReservesManager
-        - NewReservesPendingAdmin
+        - Collateral
       abis:
         - name: Factory
           file: ./abis/Factory.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
       eventHandlers:
         - event: LendingPoolInitialized(indexed address,indexed address,indexed address,address,address,address,uint256)
           handler: handleLendingPoolInitialized
-        - event: NewAdmin(address,address)
-          handler: handleNewAdmin
-        - event: NewPendingAdmin(address,address)
-          handler: handleNewPendingAdmin
-        - event: NewReservesAdmin(address,address)
-          handler: handleNewReservesAdmin
-        - event: NewReservesManager(address,address)
-          handler: handleNewReservesManager
-        - event: NewReservesPendingAdmin(address,address)
-          handler: handleNewReservesPendingAdmin
-      file: ./src/mapping.ts
+      file: ./src/mappings/factory.ts
+templates:
+  - kind: ethereum/contract
+    name: Collateral
+    network: ropsten
+    source:
+      abi: Collateral
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Collateral
+      abis:
+       - name: Collateral
+         file: ./abis/Collateral.json
+      eventHandlers:
+        - event: Sync(uint256)
+          handler: handleSync
+        - event: NewSafetyMargin(uint256)
+          handler: handleNewSafetyMargin
+        - event: NewLiquidationIncentive(uint256)
+          handler: handleNewLiquidationIncentive
+      file: ./src/mappings/collateral.ts
+  - kind: ethereum/contract
+    name: Borrowable
+    network: ropsten
+    source:
+      abi: Borrowable
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Borrowable
+      abis:
+       - name: Borrowable
+         file: ./abis/Borrowable.json
+      eventHandlers:
+        - event: Sync(uint256)
+          handler: handleSync
+        - event: AccrueInterest(uint256,uint256,uint256)
+          handler: handleAccrueInterest
+        - event: Borrow(indexed address,indexed address,indexed address,uint256,uint256,uint256,uint256,uint256)
+          handler: handleBorrow
+        - event: Liquidate(indexed address,indexed address,indexed address,uint256,uint256,uint256,uint256,uint256)
+          handler: handleLiquidate
+        - event: CalculateKinkBorrowRate(uint256)
+          handler: handleCalculateKinkBorrowRate
+        - event: CalculateBorrowRate(uint256)
+          handler: handleCalculateBorrowRate
+        - event: NewReserveFactor(uint256)
+          handler: handleNewReserveFactor
+        - event: NewKinkUtilizationRate(uint256)
+          handler: handleNewKinkUtilizationRate
+      file: ./src/mappings/borrowable.ts

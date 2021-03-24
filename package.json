@@ -2,7 +2,7 @@
   "name": "impermax-x-uniswapv2",
   "license": "UNLICENSED",
   "scripts": {
-    "codegen": "graph codegen",
+    "codegen": "graph codegen --output-dir src/types/",
     "build": "graph build",
     "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ Impermax-Finance/impermax-x-uniswapv2",
     "create-local": "graph create --node http://localhost:8020/ Impermax-Finance/impermax-x-uniswapv2",
