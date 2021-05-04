@@ -34,6 +34,10 @@ dataSources:
           file: ./abis/FarmingPool.json
         - name: Distributor
           file: ./abis/Distributor.json
+        - name: Collateral
+          file: ./abis/Collateral.json
+        - name: Borrowable
+          file: ./abis/Borrowable.json
       eventHandlers:
         - event: LendingPoolInitialized(indexed address,indexed address,indexed address,address,address,address,uint256)
           handler: handleLendingPoolInitialized
@@ -87,6 +91,8 @@ templates:
           handler: handleNewSafetyMargin
         - event: NewLiquidationIncentive(uint256)
           handler: handleNewLiquidationIncentive
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
   - kind: ethereum/contract
     name: Borrowable
     network: mainnet
@@ -125,6 +131,8 @@ templates:
           handler: handleNewKinkUtilizationRate
         - event: NewBorrowTracker(address)
           handler: handleNewBorrowTracker
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
   - kind: ethereum/contract
     name: FarmingPool
     network: mainnet

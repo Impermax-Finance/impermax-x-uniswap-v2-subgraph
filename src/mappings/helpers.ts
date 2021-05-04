@@ -4,11 +4,13 @@ import { ERC20 } from '../types/ImpermaxFactory/ERC20'
 import { ERC20SymbolBytes } from '../types/ImpermaxFactory/ERC20SymbolBytes'
 import { ERC20NameBytes } from '../types/ImpermaxFactory/ERC20NameBytes'
 import { IMPERMAX_FACTORY_ADDRESS, UNISWAP_FACTORY_ADDRESS } from './constants'
-import { ImpermaxFactory, Borrowable, Collateral, LendingPool, Token, Pair, Distributor } from "../types/schema"
+import { ImpermaxFactory, Borrowable, Collateral, LendingPool, Token, Pair, Distributor, User, CollateralPosition, SupplyPosition, BorrowPosition } from "../types/schema"
 import { UniswapFactory as UniswapFactoryContract } from '../types/ImpermaxFactory/UniswapFactory'
 import { Pair as PairContract } from '../types/ImpermaxFactory/Pair'
 import { FarmingPool as FarmingPoolContract } from '../types/ImpermaxFactory/FarmingPool'
 import { Distributor as DistributorContract } from '../types/ImpermaxFactory/Distributor'
+import { Collateral as CollateralContract } from '../types/ImpermaxFactory/Collateral'
+import { Borrowable as BorrowableContract } from '../types/ImpermaxFactory/Borrowable'
 import { Pair as PairTemplate } from '../types/templates'
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
@@ -122,6 +124,16 @@ export function fetchTokenDecimals(tokenAddress: Address): BigInt {
   return BigInt.fromI32(decimalValue as i32)
 }
 
+export function fetchCollateralExchangeRate(collateralAddress: Address): BigDecimal {
+  let contract = CollateralContract.bind(collateralAddress)
+  return convertTokenToDecimal(contract.exchangeRate(), BI_18)
+}
+
+export function fetchBorrowableExchangeRate(borrowableAddress: Address): BigDecimal {
+  let contract = BorrowableContract.bind(borrowableAddress)
+  return convertTokenToDecimal(contract.exchangeRate(), BI_18)
+}
+
 export function fetchFarmingPoolClaimable(farmingPoolAddress: Address): Address {
   let contract = FarmingPoolContract.bind(farmingPoolAddress)
   return contract.claimable()
@@ -209,6 +221,57 @@ export function loadOrCreateDistributor(distributorAddress: Address): Distributo
   }
   distributor.save()
   return distributor as Distributor
+}
+
+export function loadOrCreateUser(address: Address): void {
+  let user = User.load(address.toHexString())
+  if (user === null) {
+    user = new User(address.toHexString())
+    user.save()
+  }
+}
+
+export function loadOrCreateCollateralPosition(collateral: Address, user: Address): CollateralPosition {
+  let id = collateral.toHexString().concat('-').concat(user.toHexString())
+  let collateralPosition = CollateralPosition.load(id)
+  if (collateralPosition === null) {
+	loadOrCreateUser(user)
+    collateralPosition = new CollateralPosition(id)
+    collateralPosition.collateral = collateral.toHexString()
+    collateralPosition.user = user.toHexString()
+    collateralPosition.balance = ZERO_BD
+    collateralPosition.save()
+  }
+  return collateralPosition as CollateralPosition
+}
+
+export function loadOrCreateSupplyPosition(borrowable: Address, user: Address): SupplyPosition {
+  let id = borrowable.toHexString().concat('-').concat(user.toHexString())
+  let supplyPosition = SupplyPosition.load(id)
+  if (supplyPosition === null) {
+	loadOrCreateUser(user)
+    supplyPosition = new SupplyPosition(id)
+    supplyPosition.borrowable = borrowable.toHexString()
+    supplyPosition.user = user.toHexString()
+    supplyPosition.balance = ZERO_BD
+    supplyPosition.save()
+  }
+  return supplyPosition as SupplyPosition
+}
+
+export function loadOrCreateBorrowPosition(borrowable: Address, user: Address): BorrowPosition {
+  let id = borrowable.toHexString().concat('-').concat(user.toHexString())
+  let borrowPosition = BorrowPosition.load(id)
+  if (borrowPosition === null) {
+	loadOrCreateUser(user)
+    borrowPosition = new BorrowPosition(id)
+    borrowPosition.borrowable = borrowable.toHexString()
+    borrowPosition.user = user.toHexString()
+    borrowPosition.borrowBalance = ZERO_BD
+    borrowPosition.borrowIndex = ONE_BD
+    borrowPosition.save()
+  }
+  return borrowPosition as BorrowPosition
 }
 
 export function updateLendingPoolUSD(pairAddress: String): void {

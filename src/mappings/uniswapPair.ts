@@ -7,8 +7,6 @@ import { convertTokenToDecimal, ADDRESS_ZERO, ONE_BI, ZERO_BD, BI_18, updateLend
 import { UNISWAP_FACTORY_ADDRESS } from './constants'
 
 
-//TODO go back to sync, use this only for testing
-
 export function handleMint(event: Mint): void {
 	  
   let pair = Pair.load(event.address.toHex())
