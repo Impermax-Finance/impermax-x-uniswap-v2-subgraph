@@ -5,17 +5,32 @@ import { ZERO_BD, ADDRESS_ZERO, ONE_BD, uniswapFactoryContract } from './helpers
 import { WETH_ADDRESS, STABLE_WETH_PAIR } from './constants'
 import {
   loadOrCreatePair,
+  convertTokenToDecimal,
 } from './helpers'
+import { Pair as PairContract } from '../types/templates/Pair/Pair'
+import { ERC20 } from '../types/templates/Pair/ERC20'
+
+function getRelativePrice(pairAddress: Address, tokenAddress: String): BigDecimal {
+  let pairContract = PairContract.bind(pairAddress)
+  let reserves = pairContract.getReserves()
+  let token0 = pairContract.token0()
+  let token1 = pairContract.token1()
+  let token0Contract = ERC20.bind(token0)
+  let token1Contract = ERC20.bind(token1)
+  let decimals0 = token0Contract.decimals()
+  let decimals1 = token1Contract.decimals()
+  let reserve0 = convertTokenToDecimal(reserves.value0, BigInt.fromI32(decimals0))
+  let reserve1 = convertTokenToDecimal(reserves.value1, BigInt.fromI32(decimals1))
+  if (token0.toHexString() == tokenAddress) {
+	return reserve1.div(reserve0)
+  } else {
+	return reserve0.div(reserve1)
+  }
+  return ONE_BD
+}
 
 export function getEthPriceInUSD(): BigDecimal {
-  let stablePair = Pair.load(STABLE_WETH_PAIR)
-  if (!stablePair) return ZERO_BD
-  if (stablePair.token0 == WETH_ADDRESS) {
-    return stablePair.token1Price
-  }
-  else {
-	return stablePair.token0Price
-  }
+  return getRelativePrice(Address.fromString(STABLE_WETH_PAIR), WETH_ADDRESS)
 }
 
 
@@ -25,13 +40,5 @@ export function findEthPerToken(token: Token): BigDecimal {
   }
   let pairAddress = uniswapFactoryContract.getPair(Address.fromString(token.id), Address.fromString(WETH_ADDRESS))
   if (pairAddress.toHexString() == ADDRESS_ZERO) return ZERO_BD
-  let pair = loadOrCreatePair(pairAddress)
-  if (pair.token0 == token.id) {
-	let token1 = Token.load(pair.token1)
-	return pair.token1Price.times(token1.derivedETH as BigDecimal) // return token1 per our token * Eth per token 1
-  }
-  else {
-	let token0 = Token.load(pair.token0)
-	return pair.token0Price.times(token0.derivedETH as BigDecimal) // return token0 per our token * ETH per token 0
-  }
+  return getRelativePrice(pairAddress, token.id)
 }

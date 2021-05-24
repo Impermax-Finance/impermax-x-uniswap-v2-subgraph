@@ -48,7 +48,7 @@ type Pair @entity {
   # derived prices
   derivedETH: BigDecimal!
   derivedUSD: BigDecimal!
-  
+    
   syncCount: BigInt!
 }
 
@@ -89,6 +89,11 @@ type Borrowable @entity {
   totalBalanceUSD: BigDecimal!
   totalSupplyUSD: BigDecimal!
   totalBorrowsUSD: BigDecimal!
+  
+  # derived APR
+  # borrowAPR: BigDecimal!
+  # supplyAPR: BigDecimal!
+  # farmingAPR: BigDecimal!
 
   lendingPool: LendingPool!
   farmingPool: FarmingPool

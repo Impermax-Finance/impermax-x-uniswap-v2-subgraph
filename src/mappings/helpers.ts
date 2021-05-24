@@ -12,6 +12,7 @@ import { Distributor as DistributorContract } from '../types/ImpermaxFactory/Dis
 import { Collateral as CollateralContract } from '../types/ImpermaxFactory/Collateral'
 import { Borrowable as BorrowableContract } from '../types/ImpermaxFactory/Borrowable'
 import { Pair as PairTemplate } from '../types/templates'
+import { StakedLPToken as StakedLPTokenTemplate } from '../types/templates'
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
 
@@ -210,6 +211,7 @@ export function loadOrCreatePair(pairAddress: Address): Pair {
   }
   pair.save()
   PairTemplate.create(pairAddress)
+  StakedLPTokenTemplate.create(pairAddress)
   return pair as Pair
 }
 

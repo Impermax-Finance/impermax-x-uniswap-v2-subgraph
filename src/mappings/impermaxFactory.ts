@@ -2,7 +2,7 @@ import { BigInt, BigDecimal, log } from "@graphprotocol/graph-ts"
 import {
   LendingPoolInitialized
 } from "../types/ImpermaxFactory/ImpermaxFactory"
-import { IMPERMAX_FACTORY_ADDRESS, UNISWAP_FACTORY_ADDRESS } from './constants'
+import { IMPERMAX_FACTORY_ADDRESS } from './constants'
 import { ImpermaxFactory, Pair, Bundle, Token, LendingPool, Collateral, Borrowable } from "../types/schema"
 import { Pair as PairTemplate, Borrowable as BorrowableTemplate, Collateral as CollateralTemplate } from '../types/templates'
 import {

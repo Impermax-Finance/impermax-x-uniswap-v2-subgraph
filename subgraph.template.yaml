@@ -38,6 +38,8 @@ dataSources:
           file: ./abis/Collateral.json
         - name: Borrowable
           file: ./abis/Borrowable.json
+        - name: StakedLPToken
+          file: ./abis/StakedLPToken.json
       eventHandlers:
         - event: LendingPoolInitialized(indexed address,indexed address,indexed address,address,address,address,uint256)
           handler: handleLendingPoolInitialized
@@ -66,9 +68,11 @@ templates:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: PoolToken
+          file: ./abis/PoolToken.json
       eventHandlers:
         - event: Mint(indexed address,uint256,uint256)
-          handler: handleMint
+          handler: handleMint1
   - kind: ethereum/contract
     name: Collateral
     network: {{network}}
@@ -153,3 +157,33 @@ templates:
       eventHandlers:
         - event: Advance(uint256,uint256)
           handler: handleAdvance
+  - kind: ethereum/contract
+    name: StakedLPToken
+    network: {{network}}
+    source:
+      abi: StakedLPToken
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/mappings/uniswapPair.ts
+      entities:
+        - Pair
+      abis:
+        - name: StakedLPToken
+          file: ./abis/StakedLPToken.json
+        - name: Pair
+          file: ./abis/pair.json
+        - name: UniswapFactory
+          file: ./abis/uniswapFactory.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: PoolToken
+          file: ./abis/PoolToken.json
+      eventHandlers:
+        - event: Sync(uint256)
+          handler: handleSync2

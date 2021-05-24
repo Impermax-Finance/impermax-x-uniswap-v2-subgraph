@@ -5,11 +5,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: ImpermaxFactory
-    network: mainnet
+    network: matic
     source:
-      address: "0x8c3736e2fe63cc2cd89ee228d9dbcab6ce5b767b"
+      address: "0xBB92270716C8c424849F17cCc12F4F24AD4064D6"
       abi: ImpermaxFactory
-      startBlock: 11940265
+      startBlock: 14868433
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -38,13 +38,15 @@ dataSources:
           file: ./abis/Collateral.json
         - name: Borrowable
           file: ./abis/Borrowable.json
+        - name: StakedLPToken
+          file: ./abis/StakedLPToken.json
       eventHandlers:
         - event: LendingPoolInitialized(indexed address,indexed address,indexed address,address,address,address,uint256)
           handler: handleLendingPoolInitialized
 templates:
   - kind: ethereum/contract
     name: Pair
-    network: mainnet
+    network: matic
     source:
       abi: Pair
     mapping:
@@ -66,12 +68,14 @@ templates:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: PoolToken
+          file: ./abis/PoolToken.json
       eventHandlers:
         - event: Mint(indexed address,uint256,uint256)
-          handler: handleMint
+          handler: handleMint1
   - kind: ethereum/contract
     name: Collateral
-    network: mainnet
+    network: matic
     source:
       abi: Collateral
     mapping:
@@ -95,7 +99,7 @@ templates:
           handler: handleTransfer
   - kind: ethereum/contract
     name: Borrowable
-    network: mainnet
+    network: matic
     source:
       abi: Borrowable
     mapping:
@@ -135,7 +139,7 @@ templates:
           handler: handleTransfer
   - kind: ethereum/contract
     name: FarmingPool
-    network: mainnet
+    network: matic
     source:
       abi: FarmingPool
     mapping:
@@ -153,3 +157,33 @@ templates:
       eventHandlers:
         - event: Advance(uint256,uint256)
           handler: handleAdvance
+  - kind: ethereum/contract
+    name: StakedLPToken
+    network: matic
+    source:
+      abi: StakedLPToken
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/mappings/uniswapPair.ts
+      entities:
+        - Pair
+      abis:
+        - name: StakedLPToken
+          file: ./abis/StakedLPToken.json
+        - name: Pair
+          file: ./abis/pair.json
+        - name: UniswapFactory
+          file: ./abis/uniswapFactory.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: PoolToken
+          file: ./abis/PoolToken.json
+      eventHandlers:
+        - event: Sync(uint256)
+          handler: handleSync2
