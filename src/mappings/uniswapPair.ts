@@ -2,12 +2,12 @@
 import { BigInt, BigDecimal, store, Address, log } from '@graphprotocol/graph-ts'
 import { Pair, LendingPool, Collateral, Borrowable, Token, Bundle } from '../types/schema'
 import { Pair as PairContract, Sync as Sync1, Mint as Mint1 } from '../types/templates/Pair/Pair'
-import { StakedLPToken as StakedLPTokenContract, Sync as Sync2, Mint as Mint2 } from '../types/templates/StakedLPToken/StakedLPToken'
+import { StakedLPToken01 as StakedLPTokenContract, Sync as Sync2, Mint as Mint2 } from '../types/templates/StakedLPToken01/StakedLPToken01'
 import { getEthPriceInUSD, findEthPerToken } from './pricing'
 import { convertTokenToDecimal, ADDRESS_ZERO, ONE_BI, ZERO_BD, BI_18, updateLendingPoolUSD } from './helpers'
 
 
-export function handleMint1(event: Mint1): void {
+export function handleSync1(event: Sync1): void {
   let pair = Pair.load(event.address.toHex()) as Pair;
   let pairContract = PairContract.bind(event.address);
   let reserves = pairContract.getReserves();
@@ -77,5 +77,5 @@ function _handleSync(pair: Pair, reserve0: BigInt, reserve1: BigInt, totalSupply
   token1.save()
   
   // update lendingPool usd values
-  updateLendingPoolUSD(pair.id)
+  //updateLendingPoolUSD(pair.id)
 }

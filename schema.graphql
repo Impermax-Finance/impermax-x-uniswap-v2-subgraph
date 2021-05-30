@@ -50,6 +50,10 @@ type Pair @entity {
   derivedUSD: BigDecimal!
     
   syncCount: BigInt!
+  
+  # staked LP token
+  isStakedLPToken: Boolean!
+  stakingRewards: StakingRewards
 }
 
 type Collateral @entity {
@@ -100,7 +104,6 @@ type Borrowable @entity {
 }
 
 type LendingPool @entity {
-  # uniswap pair address
   id: ID!
   
   pair: Pair!
@@ -133,6 +136,17 @@ type FarmingPool @entity {
   segmentLength: BigInt!
   vestingBegin: BigInt!
   sharePercentage: BigDecimal!
+}
+
+type StakingRewards @entity {
+  # address
+  id: ID!
+  
+  # mirrored from the smart contract
+  rewardsToken: Token!
+  rewardRate: BigDecimal!
+  totalSupply: BigDecimal!
+  periodFinish: BigInt!
 }
 
 

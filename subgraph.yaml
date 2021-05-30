@@ -38,8 +38,10 @@ dataSources:
           file: ./abis/Collateral.json
         - name: Borrowable
           file: ./abis/Borrowable.json
-        - name: StakedLPToken
-          file: ./abis/StakedLPToken.json
+        - name: StakedLPToken01
+          file: ./abis/StakedLPToken01.json
+        - name: StakingRewards
+          file: ./abis/StakingRewards.json
       eventHandlers:
         - event: LendingPoolInitialized(indexed address,indexed address,indexed address,address,address,address,uint256)
           handler: handleLendingPoolInitialized
@@ -71,8 +73,8 @@ templates:
         - name: PoolToken
           file: ./abis/PoolToken.json
       eventHandlers:
-        - event: Mint(indexed address,uint256,uint256)
-          handler: handleMint1
+        - event: Sync(uint112,uint112)
+          handler: handleSync1
   - kind: ethereum/contract
     name: Collateral
     network: matic
@@ -158,10 +160,10 @@ templates:
         - event: Advance(uint256,uint256)
           handler: handleAdvance
   - kind: ethereum/contract
-    name: StakedLPToken
+    name: StakedLPToken01
     network: matic
     source:
-      abi: StakedLPToken
+      abi: StakedLPToken01
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -170,8 +172,8 @@ templates:
       entities:
         - Pair
       abis:
-        - name: StakedLPToken
-          file: ./abis/StakedLPToken.json
+        - name: StakedLPToken01
+          file: ./abis/StakedLPToken01.json
         - name: Pair
           file: ./abis/pair.json
         - name: UniswapFactory
@@ -187,3 +189,25 @@ templates:
       eventHandlers:
         - event: Sync(uint256)
           handler: handleSync2
+  - kind: ethereum/contract
+    name: StakingRewards
+    network: matic
+    source:
+      abi: StakingRewards
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/mappings/stakingRewards.ts
+      entities:
+        - StakingRewards
+      abis:
+        - name: StakingRewards
+          file: ./abis/StakingRewards.json
+      eventHandlers:
+        - event: RewardAdded(uint256,uint256)
+          handler: handleRewardAdded
+        - event: Staked(indexed address,uint256)
+          handler: handleStaked
+        - event: Withdrawn(indexed address,uint256)
+          handler: handleWithdrawn

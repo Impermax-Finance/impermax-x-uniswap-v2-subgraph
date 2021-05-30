@@ -96,5 +96,6 @@ export function handleLendingPoolInitialized(event: LendingPoolInitialized): voi
   CollateralTemplate.create(event.params.collateral)
   BorrowableTemplate.create(event.params.borrowable0)
   BorrowableTemplate.create(event.params.borrowable1)
+   
 }
 

@@ -4,15 +4,18 @@ import { ERC20 } from '../types/ImpermaxFactory/ERC20'
 import { ERC20SymbolBytes } from '../types/ImpermaxFactory/ERC20SymbolBytes'
 import { ERC20NameBytes } from '../types/ImpermaxFactory/ERC20NameBytes'
 import { IMPERMAX_FACTORY_ADDRESS, UNISWAP_FACTORY_ADDRESS } from './constants'
-import { ImpermaxFactory, Borrowable, Collateral, LendingPool, Token, Pair, Distributor, User, CollateralPosition, SupplyPosition, BorrowPosition } from "../types/schema"
+import { ImpermaxFactory, Borrowable, Collateral, LendingPool, Token, Pair, Distributor, User, CollateralPosition, SupplyPosition, BorrowPosition, StakingRewards } from "../types/schema"
 import { UniswapFactory as UniswapFactoryContract } from '../types/ImpermaxFactory/UniswapFactory'
 import { Pair as PairContract } from '../types/ImpermaxFactory/Pair'
 import { FarmingPool as FarmingPoolContract } from '../types/ImpermaxFactory/FarmingPool'
 import { Distributor as DistributorContract } from '../types/ImpermaxFactory/Distributor'
 import { Collateral as CollateralContract } from '../types/ImpermaxFactory/Collateral'
 import { Borrowable as BorrowableContract } from '../types/ImpermaxFactory/Borrowable'
+import { StakedLPToken01 as StakedLPTokenContract } from '../types/ImpermaxFactory/StakedLPToken01'
+import { StakingRewards as StakingRewardsContract } from '../types/ImpermaxFactory/StakingRewards'
 import { Pair as PairTemplate } from '../types/templates'
-import { StakedLPToken as StakedLPTokenTemplate } from '../types/templates'
+import { StakedLPToken01 as StakedLPTokenTemplate } from '../types/templates'
+import { StakingRewards as StakingRewardsTemplate } from '../types/templates'
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
 
@@ -208,10 +211,30 @@ export function loadOrCreatePair(pairAddress: Address): Pair {
     pair.derivedETH = ZERO_BD
     pair.derivedUSD = ZERO_BD
     pair.syncCount = ZERO_BI
+    pair.isStakedLPToken = false
+
+    PairTemplate.create(pairAddress)
+    
+    // check if stakedLpToken
+    let stakedLPTokenContract = StakedLPTokenContract.bind(pairAddress)
+	let isStakedLPTokenCallResult = stakedLPTokenContract.try_isStakedLPToken()
+    if (!isStakedLPTokenCallResult.reverted && isStakedLPTokenCallResult.value) {
+      let stakingRewardsAddress = stakedLPTokenContract.stakingRewards()
+      let stakingRewardsContract = StakingRewardsContract.bind(stakingRewardsAddress)
+      let stakingRewards = new StakingRewards(stakingRewardsAddress.toHexString())
+      stakingRewards.rewardsToken = stakingRewardsContract.rewardsToken().toHexString()
+      stakingRewards.rewardRate = convertTokenToDecimal(stakingRewardsContract.rewardRate(), BI_18)
+      stakingRewards.totalSupply = convertTokenToDecimal(stakingRewardsContract.totalSupply(), BI_18)
+      stakingRewards.periodFinish = stakingRewardsContract.periodFinish()
+      stakingRewards.save()
+      StakedLPTokenTemplate.create(pairAddress)
+      StakingRewardsTemplate.create(stakingRewardsAddress)
+  	
+	  pair.isStakedLPToken = true
+      pair.stakingRewards = stakingRewardsAddress.toHexString()
+    }
   }
   pair.save()
-  PairTemplate.create(pairAddress)
-  StakedLPTokenTemplate.create(pairAddress)
   return pair as Pair
 }
 
